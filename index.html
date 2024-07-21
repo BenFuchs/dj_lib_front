@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <div id="bookView">
+        
+    </div>
+    <script>
+        const SERVER = 'http://127.0.0.1:8000/bookView';
+        axios(SERVER).then(res => {
+            const bookViewDiv = document.getElementById('bookView');
+            const data = res.data;
+            let htmlContent = '<ul>';
+            data.forEach(book => {
+                htmlContent += `<li>${book.bName} by ${book.author} published ${book.published} <button>LOAN</button></li>`; // Adjust according to your data structure
+            });
+            htmlContent += '</ul>';
+            bookViewDiv.innerHTML = htmlContent;
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    </script>
+    
+</body>
+</html>
