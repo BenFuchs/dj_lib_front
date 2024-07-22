@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER PAGE</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+</head>
+<body>
+    <a href="index.html">TEST</a>
+    <div id="loanView"></div>
+
+    <script>
+        const SERVER = 'http://127.0.0.1:8000/';
+
+        const getToken = () => {
+            return localStorage.getItem('token');
+        };
+
+        const token = getToken();
+        console.log(token)
+        if (token) {
+            axios.get(`${SERVER}showLoans`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => {
+                const loanViewDiv = document.getElementById('loanView');
+                const loans = res.data;
+
+                let htmlContent = '<ul>';
+                loans.forEach(loan => {
+                    htmlContent += `<li>ID:${loan.id} -- BOOKID:${loan.BookID} <button onclick='returnBook(${loan.BookID})'>RETURN BOOK</button></li>`;
+                });
+                htmlContent += '</ul>';
+
+                loanViewDiv.innerHTML = htmlContent;
+            }).catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        } else {
+            console.error('No token found in localStorage');
+        }
+
+        const returnBook = (id) => {
+            axios.post(`${SERVER}returnBook/${id}`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => {
+                console.log(res.data);
+                // Optionally, update UI or handle success
+            }).catch(error => {
+                console.error('Error returning book:', error);
+            });
+        };
+    </script>
+</body>
+</html>

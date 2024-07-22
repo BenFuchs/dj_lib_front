@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+</head>
+<body>
+    <form id="login">
+        <label for="username">Username: </label>
+        <input id="username" name="username"> <br>
+        <label for="password">Password: </label>
+        <input id="password" name="password" type="password">
+        <button type="submit">Log In</button>
+    </form>
+
+    <script>
+        const SERVER = 'http://127.0.0.1:8000/';
+
+        const login = async (event) => {
+            event.preventDefault();  // Prevent form submission
+
+            // Get form data
+            const formData = new FormData(document.getElementById('login'));
+            const username = formData.get('username');
+            const password = formData.get('password');
+
+            // Example: Using Axios to send POST request
+            try {
+                const response = await axios.post(`${SERVER}login/`, {
+                    username: username,
+                    password: password
+                });
+                console.log('Login successful:', response.data.access);
+                const token = response.data.access;
+                localStorage.setItem("token" , token)
+                // Redirect or handle success as needed
+                window.location.href = 'index.html'
+            } catch (error) {
+                console.error('Login error:', error);
+                // Handle error response
+            }
+        };
+
+        document.getElementById('login').addEventListener('submit', login);
+    </script>
+</body>
+</html>

@@ -8,23 +8,94 @@
 
 </head>
 <body>
-    <div id="bookView">
-        
-    </div>
+    <div id="bookView"></div>
+    <a href="userPage.html">TEST</a>
+    <button onclick="logout()">LOGOUT</button>
     <script>
-        const SERVER = 'http://127.0.0.1:8000/bookView';
-        axios(SERVER).then(res => {
+        const SERVER = 'http://127.0.0.1:8000/';
+        axios(SERVER+'bookView').then(res => {
             const bookViewDiv = document.getElementById('bookView');
             const data = res.data;
             let htmlContent = '<ul>';
             data.forEach(book => {
-                htmlContent += `<li>${book.bName} by ${book.author} published ${book.published} <button>LOAN</button></li>`; // Adjust according to your data structure
+                htmlContent += `<li>${book.bName} by ${book.author} published ${book.published} <button onclick='loan(${book.id})'>LOAN</button></li>`; // Adjust according to your data structure
             });
             htmlContent += '</ul>';
             bookViewDiv.innerHTML = htmlContent;
         }).catch(error => {
             console.error('Error fetching data:', error);
         });
+
+        const getToken = () => {
+            return localStorage.getItem('token');
+        };
+
+        // Function to handle loaning a book
+        const loan = (id) => {
+            console.log(id);
+            const token = getToken();
+            if (!token) {
+                console.error('No token found in localStorage');
+                return;
+            }
+
+            axios.post(`${SERVER}/loan/${id}`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => {
+                console.log('Loan successful:', res.data);
+                // Handle success response as needed
+            }).catch(error => {
+                console.error('Loan error:', error);
+                // Handle error response
+            });
+        };
+
+        // Fetching book data
+        axios.get(SERVER + 'bookView').then(res => {
+            const bookViewDiv = document.getElementById('bookView');
+            const data = res.data;
+            let htmlContent = '<ul>';
+            data.forEach(book => {
+                htmlContent += `<li>${book.bName} by ${book.author} published ${book.published} <button onclick='loan(${book.id})'>LOAN</button></li>`; // Adjust according to your data structure
+            });
+            htmlContent += '</ul>';
+            bookViewDiv.innerHTML = htmlContent;
+        }).catch(error => {
+            console.error('Error fetching data:', error);
+        });
+        
+
+        const logout = () => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.error('No token found in localStorage');
+        return;
+    }
+
+    axios.post(`${SERVER}logout/`, {}, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(res => {
+        console.log('Logout successful');
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';  // Redirect to login page
+    }).catch(error => {
+        console.error('Error logging out:', error);
+        // Handle specific errors (like 401 Unauthorized) if needed
+        if (error.response && error.response.status === 401) {
+            console.error('Unauthorized: Please login again.');
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';  // Redirect to login page
+        }
+    });
+};
+
+
+
     </script>
     
 </body>
